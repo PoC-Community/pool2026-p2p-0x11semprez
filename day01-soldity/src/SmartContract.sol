@@ -1,7 +1,13 @@
-//SPDX-Licence-Identifier: MIT
-pragma solidity ^0.8.4;
+//SPDX-Licence-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
 
-contract SmartContract {
+import {ISmartContract} from "./interface/ISmartContract.sol";
+
+contract SmartContract is ISmartContract {
+    error InsufficientBalance(uint256 available, uint256 requested);
+
+    event BalanceUpdated(address indexed user, uint256 newBalance);
+
     uint public halfAnswerOfLife = 21;
 
     address public myEthereumContractAddress = address(this);
@@ -23,6 +29,8 @@ contract SmartContract {
 
     address private owner;
 
+    mapping(address => uint256) public balances;
+
     enum roleEnum {
         STUDENT,
         TEACHER
@@ -38,8 +46,8 @@ contract SmartContract {
 
     informations public myInformations;
 
-    constructor(address _owner) {
-        owner = _owner;
+    constructor() {
+        owner = msg.sender;
         myInformations = informations({
             firstName: "John",
             lastName: "Doe",
@@ -78,7 +86,7 @@ contract SmartContract {
         );
     }
 
-    function getHalfAnswerOfLife() public view returns (string memory) {
+    function getHalfAnswerOfLife() public view returns (uint) {
         return 21;
     }
 
@@ -111,6 +119,31 @@ contract SmartContract {
 
     function getMyFullName() public view returns (string memory) {
         return
-            string.concat(myInformations.firstName, "", myInformation.lastName);
+            string.concat(
+                myInformations.firstName,
+                "",
+                myInformations.lastName
+            );
+    }
+
+    function getMyBalance() public view returns (uint256) {
+        return balances[msg.sender];
+    }
+
+    function addToBalance() public payable {
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdrawFromBalance(uint256 _amount, address to) public {
+        if (balances[msg.sender] < _amount) {
+            revert InsufficientBalance(balances[msg.sender], _amount);
+        }
+
+        balances[msg.sender] -= _amount;
+
+        (bool sucess, ) = to.call{value: _amount}("");
+        require(sucess, "failed");
+
+        emit BalanceUpdated(msg.sender, balances[msg.sender]);
     }
 }

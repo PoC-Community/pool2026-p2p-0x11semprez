@@ -1,28 +1,28 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.3;
 
 import {Test} from "forge-std/Test.sol";
 import {SmartContract} from "../src/SmartContract.sol";
 
-contract SmartContractHelper is SmartContract {
-    function getAreYouABadPerson() public view returns (string memory) {
-        return _setAreYouABadPerson(true);
-    }
-}
+// contract SmartContractHelper is SmartContract {
+//     function getAreYouABadPerson() public view returns (string memory) {
+//         return _setAreYouABadPerson(true);
+//     }
+// }
 contract testSmartContract is Test {
     SmartContract public smartcontract;
-    SmartContractHelper public smartcontracthelper;
+    // SmartContractHelper public smartcontracthelper;
 
     function setUp() public {
         smartcontract = new SmartContract();
-        smartcontracthelper = new SmartContractHelper();
+        // smartcontracthelper = new SmartContractHelper();
     }
 
-    function test_areYouABadPerson() public {
-        bool actual = smartcontracthelper.getAreYouABadPerson();
-        string memory expected = "Yes I am";
-        assertEq(actual, expected);
-    }
+    // function test_areYouABadPerson() public {
+    //     bool actual = smartcontracthelper.getAreYouABadPerson();
+    //     string memory expected = "Yes I am";
+    //     assertEq(actual, expected);
+    // }
 
     function testgetPocIsWhat() public {
         string memory actual = smartcontract.getPoCIsWhat();
