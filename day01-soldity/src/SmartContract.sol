@@ -21,6 +21,8 @@ contract SmartContract {
 
     string[5] public myPhoneNumber;
 
+    address private owner;
+
     enum roleEnum {
         STUDENT,
         TEACHER
@@ -36,7 +38,8 @@ contract SmartContract {
 
     informations public myInformations;
 
-    constructor() {
+    constructor(address _owner) {
+        owner = _owner;
         myInformations = informations({
             firstName: "John",
             lastName: "Doe",
@@ -44,6 +47,15 @@ contract SmartContract {
             city: "Paris",
             role: true
         });
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
+    function sensitiveAction(address newOwner) public onlyOwner {
+        owner = newOwner;
     }
 
     function getStruct()
@@ -67,7 +79,12 @@ contract SmartContract {
     }
 
     function getHalfAnswerOfLife() public view returns (string memory) {
-        return "No idea";
+        return 21;
+    }
+
+    function addGetHalfAnswerOfLife() external onlyOwner returns (bool) {
+        halfAnswerOfLife += 21;
+        return true;
     }
 
     function _getMyEthereumContractAddress() internal view returns (address) {
