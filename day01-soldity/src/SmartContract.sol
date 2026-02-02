@@ -87,4 +87,13 @@ contract SmartContract {
             return "No I am not";
         }
     }
+
+    function editMyCity(string calldata _newCity) public {
+        myInformations.city = _newCity;
+    }
+
+    function getMyFullName() public view returns (string memory) {
+        return
+            string.concat(myInformations.firstName, "", myInformation.lastName);
+    }
 }
