@@ -6,7 +6,7 @@ import {ISmartContract} from "./interface/ISmartContract.sol";
 contract SmartContract is ISmartContract {
     error InsufficientBalance(uint256 available, uint256 requested);
 
-    event BalanceUpdated(address indexed user, uint256 newBalance);
+    event BalanceUpdated(address indexed user, uint256 indexed newBalance);
 
     uint public halfAnswerOfLife = 21;
 
@@ -145,5 +145,12 @@ contract SmartContract is ISmartContract {
         require(sucess, "failed");
 
         emit BalanceUpdated(msg.sender, balances[msg.sender]);
+    }
+
+    function hashMyMessage(
+        string calldata _message
+    ) external pure returns (bytes32) {
+        bytes32 message = keccak256(abi.encodePacked(_message));
+        return message;
     }
 }
