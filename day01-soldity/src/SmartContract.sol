@@ -36,6 +36,36 @@ contract SmartContract {
 
     informations public myInformations;
 
+    constructor() {
+        myInformations = informations({
+            firstName: "John",
+            lastName: "Doe",
+            age: 30,
+            city: "Paris",
+            role: true
+        });
+    }
+
+    function getStruct()
+        public
+        view
+        returns (
+            string memory firstName,
+            string memory lastName,
+            uint8 age,
+            string memory city,
+            bool role
+        )
+    {
+        return (
+            myInformations.firstName,
+            myInformations.lastName,
+            myInformations.age,
+            myInformations.city,
+            myInformations.role
+        );
+    }
+
     function getHalfAnswerOfLife() public view returns (string memory) {
         return "No idea";
     }
@@ -51,7 +81,7 @@ contract SmartContract {
     function _setAreYouABadPerson(
         bool _value
     ) internal returns (string memory) {
-        if (_value = true) {
+        if (_value == true) {
             return "Yes I am";
         } else {
             return "No I am not";
