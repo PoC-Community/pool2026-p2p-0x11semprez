@@ -10,7 +10,9 @@ contract TestPoolToken is Test {
     address owner = address(this);
     address user = 0x7585149f7a1281280fe44Aff1c6055623B44f395;
 
-    uint constant INITIAL_SUPPLY = 100000000 ether;
+    uint INITIAL_SUPPLY = 100000000 ether;
+
+    string URI = bafkreiejf63jkiglsjmbqlhmduf7li7rebs5ec27vjczm6yvikszvstoyq;
 
     function setUp() public {
         token = new PoolToken(INITIAL_SUPPLY);
