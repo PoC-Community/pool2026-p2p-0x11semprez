@@ -4,15 +4,12 @@ pragma solidity ^0.8.3;
 import "@solady/src/tokens/ERC20.sol";
 import "@solady/src/utils/SafeTransferLib.sol";
 import "@solady/src/utils/ReentrancyGuard.sol";
-import "@solady/src/access/Ownable.sol";
+import "@solady/src/auth/Ownable.sol";
 
 contract Vault is SafeTransferLib, ReentrancyGuard, Ownable {
-
-
-    ZeroAmount(); //keccak256 0x1f2a2005cb66a8e145327e8814e243a0996aec9bfe1e15a495778b1236dbd485
-    InsufficientShares(); //keccak26 0x399965675cfec4301cbe5ec24fb407575c5a7e4f40d219532068c8e5b35040f9
-    ZeroShares(); //keccak256 0x9811e0c7eeca2ee0fa751e2e19d78682ad689ea04816cfe0cf1c5863234abd3f
-
+    error ZeroAssets(); //keccak256 0x1f2a2005cb66a8e145327e8814e243a0996aec9bfe1e15a495778b1236dbd485
+    error InsufficientShares(); //keccak26 0x399965675cfec4301cbe5ec24fb407575c5a7e4f40d219532068c8e5b35040f9
+    error ZeroShares(); //keccak256 0x9811e0c7eeca2ee0fa751e2e19d78682ad689ea04816cfe0cf1c5863234abd3f
 
     event Deposit(address indexed user, uint asset, uint shares);
     event Withdraw(address indexed user, uint256 assets, uint256 shares);
@@ -28,7 +25,7 @@ contract Vault is SafeTransferLib, ReentrancyGuard, Ownable {
         ASSET = _asset;
     }
 
-    function getAsset() external viors forew returns (address) {
+    function getAsset() external view returns (address) {
         return address(ASSET);
     }
 
@@ -73,42 +70,58 @@ contract Vault is SafeTransferLib, ReentrancyGuard, Ownable {
         return (shares * _totalAssets) / totalShares;
     }
 
-    function deposit(uint shares, uint assets) external ReentrancyGuard {
+    function deposit(uint assets) external nonReentrant returns (uint shares) {
         assembly {
-            if ls(assets, 0) {
+            if iszero(assets) {
                 mstore(0x00, 0x36dbd485)
                 revert(0x1c, 0x04)
             }
-
-            let shares := 
         }
-        uint shares = _convertToShares(assets);
 
+        shares = _convertToShares(assets);
+        if (shares == 0) revert ZeroShares();
 
+        address from = msg.sender;
+        sharesOf[from] += shares;
+        shares += totalShares;
+
+        address to = address(this);
+        assets.SafeTransferFrom(from, to, assets);
+
+        emit Deposit(from, assets, shares);
     }
 
-    //
-    Verify assets > 0
-    Calculate shares using _convertToShares(assets)
-    Verify shares > 0
+    function withdraw(
+        uint shares
+    ) internal ReentrancyGuard returns (uint assets) {
+        if (shares == 0) revert ZeroShares();
+        address from = msg.sender;
 
-E - Effects:
+        uint userShares = sharesOf[from];
+        if (userShares < shares) revert InsufficientShares();
 
-    Add shares to sharesOf[msg.sender]
-    Add shares to totalShares
+        uint256 totalAsset = getAssetBalance();
 
-I - Interactions:
+        assets = _convertToAssets(shares, totalAsset, totalShares);
+        if (assets == 0) revert ZeroAssets();
 
-    Transfer tokens FROM user TO vault using safeTransferFrom
-    Emit Deposit event
+        sharesOf[from] = userShares - shares;
+        totalShares -= shares;
 
+        assets.SafeTransferFrom(from, assets);
 
-    function withdrawAll(uint assets) external returns(bool) {}
+        emit Withdraw(from, shares, assets);
+    }
+
+    function withdrawAll() external returns (uint assets) {
+        uint allShares = sharesOf[msg.sender];
+
+        assets = withdraw(allShares);
+    }
 
     function previewDeposit(uint assets) external view {}
 
-    function previewWithdraw(uint shares) external view {}
-
+    function reviewWithdraw(uint shares) external view {}
 
     receive() external payable {}
 
