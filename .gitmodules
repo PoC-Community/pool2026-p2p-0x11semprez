@@ -4,3 +4,6 @@
 [submodule "day03-solidity/lib/solady"]
 	path = day03-solidity/lib/solady
 	url = https://github.com/vectorized/solady
+[submodule "day05-solidity/lib/chainlink"]
+	path = day05-solidity/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink
