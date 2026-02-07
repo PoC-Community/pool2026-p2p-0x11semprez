@@ -1,1 +1,1 @@
-# pool2026-p2p-0x11semprez
+# rush-p2p-pool2026-xof
